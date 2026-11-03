@@ -1,24 +1,38 @@
-// src/server.ts
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import prisma from './config/prisma';
+import userRoutes from './routes/user.routes';
+import productRoutes from './routes/product.routes';
+import cartRoutes from './routes/cart.routes';
 
 dotenv.config();
 
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  process.env.CLIENT_URL,
+].filter(Boolean) as string[];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'x-user-id'],
+}));
+
 app.use(express.json());
 
-// Test Route
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: "Mobile Village Server is running successfully!" });
 });
 
-// Server & Database Connection Check
+app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
+
 app.listen(PORT, async () => {
   try {
     await prisma.$connect();
