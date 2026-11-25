@@ -1,13 +1,10 @@
 import { Router } from 'express';
-import { createUser, getUsers } from '../controllers/user.controllers';
-
+import { getUsers } from '../controllers/user.controllers';
+import { authMiddleware, adminMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// POST http://localhost:5000/api/users (ইউজার তৈরি করার জন্য)
-router.post('/', createUser);
-
-// GET http://localhost:5000/api/users (সব ইউজার দেখার জন্য)
-router.get('/', getUsers);
+// Admin only — সব user দেখা
+router.get('/', authMiddleware, adminMiddleware, getUsers);
 
 export default router;

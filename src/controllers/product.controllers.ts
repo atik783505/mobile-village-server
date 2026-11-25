@@ -184,3 +184,24 @@ export const getProductById = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const deleteProduct = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const existing = await prisma.product.findUnique({ where: { id: id as string } });
+
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Product not found.' });
+    }
+
+    await prisma.product.delete({ where: { id: id as string } });
+
+    return res.status(200).json({ success: true, message: 'Product deleted successfully.' });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Something went wrong while deleting the product.',
+    });
+  }
+};
